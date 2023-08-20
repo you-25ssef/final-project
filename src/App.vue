@@ -1,14 +1,25 @@
 <template>
   <div class="container">
-    <Header @toggle-add-book="toggleAddBook"
+    <Header @toggle-update-book="toggleUpdatebook"
+    @toggle-search-book="toggleAddsearch" 
+     @toggle-add-book="toggleAddBook"
       title="Library"
       :showAddBook="showAddBook"
-
+      :showAddsearch="showAddsearch"
+      :showupdatebook="showupdatebook"
     />
     <div v-show="showAddBook">
       <AddBook @add-book="AddBook" />
+      
     </div>
-    <Books @delete-book="deletebook" :books="books" />
+    <div v-show="showAddsearch">
+      <Searchbook @search-book="searchBook"/>
+      <Book  :book="book"/>
+    </div>
+    <div v-show="showupdatebook">
+      <UpdateBook @update-book="updateBook"/>
+    </div>
+   <Books @delete-book="deleteBook" :books="books" />
   </div>
 </template>
 
@@ -16,46 +27,87 @@
 import Header from "./components/Header";
 import AddBook from "./components/AddBook";
 import Books from "./components/Books";
+import Searchbook from "./components/Searchbook";
+import Book from "./components/Book";
+import UpdateBook from "./components/UpdateBook.vue";
 export default {
   name: "App",
   components: {
     Header,
     Books,
     AddBook,
+    Searchbook,
+    Book,
+    UpdateBook,
   },
   data() {
     return {
       books: [],
       showAddBook: false,
+      book:{},
+      showAddsearch:false,
+      searched:false,
+      showupdatebook:false,
     };
   },
   methods: {
+    
+    async searchBook(title){
+      console.log(title.title)
+       const res = await fetch(`/books/${title.title}`)
+       const data =await res.json()
+       this.book=data
+
+    },
+    toggleUpdatebook(){
+      this.showupdatebook=!this.showupdatebook
+    },
+    toggleAddsearch(){
+      this.showAddsearch=!this.showAddsearch
+    },
     toggleAddBook(){
       this.showAddBook= !this.showAddBook
     },
      async AddBook(book) {
-      const res =await fetch('http://localhost:8000/books',{
+      const res =await fetch('/books',{
         method:"POST",
         headers:{
           'content-type':'application/json',
-          body:JSON.stringify(book)
-        }
+        },
+        body:JSON.stringify(book),
       })
+      console.log(res)
       const data =await res.json()
       this.books = [...this.books, data];
     },
-    deletebook(id) {
+     async deleteBook(id) {
       if (confirm("Are you sure?")) {
-        this.books = this.books.filter((book) => book.id !== id);
+        const res=await fetch(`/books/${id}`,{
+          method:'DELETE'
+        })
+        res.status===204 ?(this.books = this.books.filter((book) => book.id !== id)):alert('Error in deleting book')
       }
     },
    async fetchBooks(){
-        const res =await fetch('http://127.0.0.1:8000/books')
+        const res =await fetch('/books')
         const data =await res.json()
         return data
     },
+    async updateBook(listy){
+        let id=listy[0];
+        let booke=listy[1];
+        const res =await fetch(`/books/${id}`,{
+        method:"PUT",
+        headers:{
+          'content-type':'application/json',
+        },
+        body:JSON.stringify(booke),
+      })
+      console.log(res)
+      this.books =await this.fetchBooks()
+    },
     async fetchBook(id){
-        const res =await fetch(`http://127.0.0.1:8000/books/${id}`)
+        const res =await fetch(`/books/${id}`)
         const data =await res.json()
         return data
     },

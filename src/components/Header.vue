@@ -3,8 +3,18 @@
       <h1>{{ title }}</h1>
       <Button
         @btn-click="$emit('toggle-add-book')"
-        :text="showAddBook ? 'Close' : 'Add Task'"
+        :text="showAddBook ? 'Close' : 'Add Book'"
         :color="showAddBook ? 'red' : 'green'"
+      />
+      <Button
+        @toggle-search-book="$emit('toggle-search-book')"
+        :text="showAddsearch ? 'Close' : 'search'"
+        :color="showAddsearch ? 'red' : 'green'"
+      />
+      <Button
+        @toggle-update-book="$emit('toggle-update-book')"
+        :text="showupdatebook ? 'Close' : 'update'"
+        :color="showupdatebook ? 'red' : 'green'"
       />
     </header>
   </template>
@@ -15,6 +25,8 @@
     props: {
       title: String,
       showAddBook: Boolean,
+      showAddsearch:Boolean,
+      showupdatebook:Boolean,
     },
     components: {
       Button,

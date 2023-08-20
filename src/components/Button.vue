@@ -11,6 +11,8 @@
         methods:{
             onClick(){
                 this.$emit('btn-click')
+                this.$emit('toggle-search-book')
+                this.$emit('toggle-update-book')
             }
     
         }
